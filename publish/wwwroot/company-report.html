@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a2e; background: #fff; }
+        .no-print { padding: 16px; text-align: center; background: #f1f5f9; }
+        .no-print button { background: #1a56db; color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 0 5px; }
+        .no-print button:hover { background: #1e40af; }
+        .no-print .btn-gray { background: #6b7280; }
+
+        /* --- BRANDED HEADER BAR --- */
+        .brand-bar { background: linear-gradient(135deg, #0f172a, #1e293b); padding: 28px 60px; display: flex; justify-content: space-between; align-items: center; }
+        .brand-left { display: flex; align-items: center; gap: 16px; }
+        .brand-shield { width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .brand-shield svg { width: 28px; height: 28px; }
+        .brand-text .brand-name { color: #fff; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .brand-text .brand-tagline { color: #94a3b8; font-size: 12px; font-weight: 500; margin-top: 2px; letter-spacing: 0.5px; }
+        .brand-right { text-align: right; }
+        .brand-right .date { color: #94a3b8; font-size: 12px; }
+        .brand-right .report-id { color: #64748b; font-size: 10px; margin-top: 3px; }
+
+        /* --- COVER / EXECUTIVE SUMMARY (Page 1) --- */
+        .cover { padding: 50px 60px; min-height: calc(100vh - 104px); display: flex; flex-direction: column; }
+        .cover-header { margin-bottom: 36px; }
+        .cover-brand .customer-logo { font-size: 44px; font-weight: 800; color: #1a1a2e; line-height: 1.1; }
+        .cover-brand .report-type { font-size: 16px; color: #64748b; font-weight: 500; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .exec-title { font-size: 20px; color: #1a56db; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+
+        /* --- CATEGORY BREAKDOWN --- */
+        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .cat-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; }
+        .cat-icon { font-size: 16px; width: 24px; text-align: center; }
+        .cat-name { font-size: 12px; font-weight: 600; color: #334155; width: 130px; flex-shrink: 0; }
+        .cat-bar-wrap { flex: 1; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+        .cat-bar { height: 100%; border-radius: 5px; transition: width 0.3s; }
+        .cat-pct { font-size: 11px; font-weight: 700; width: 36px; text-align: right; }
+
+        .score-hero { display: flex; align-items: center; gap: 40px; padding: 30px 40px; background: linear-gradient(135deg, #f8faff, #eef2ff); border-radius: 16px; margin-bottom: 30px; }
+        .score-hero-left { text-align: center; }
+        .score-hero-right { flex: 1; }
+        .score-hero-right .headline { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .score-hero-right .subline { font-size: 14px; color: #666; line-height: 1.5; }
+
+        .donut-row { display: flex; justify-content: space-around; align-items: center; margin: 30px 0; gap: 20px; flex-wrap: wrap; }
+        .donut-card { text-align: center; flex: 1; min-width: 130px; background: #f8f9fa; border-radius: 12px; padding: 20px 10px; }
+        .donut-card .label { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        .donut-card .sub { font-size: 11px; color: #666; margin-top: 6px; }
+
+        .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+        .summary-box { text-align: center; padding: 18px 12px; background: #fff; border-radius: 12px; border: 2px solid #e5e7eb; }
+        .summary-box .num { font-size: 30px; font-weight: 700; }
+        .summary-box .lbl { font-size: 11px; color: #666; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+        .green { color: #16a34a; } .red { color: #dc2626; } .blue { color: #1a56db; } .orange { color: #d97706; }
+
+        .top-issues-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .issue-card { background: #fff; border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 8px; padding: 14px 16px; }
+        .issue-card .issue-name { font-weight: 600; color: #1a1a2e; font-size: 13px; }
+        .issue-card .issue-meta { font-size: 11px; color: #dc2626; margin-top: 3px; font-weight: 600; }
+        .issue-card .issue-rec { font-size: 11px; color: #666; margin-top: 5px; }
+
+        .exec-footer { margin-top: auto; padding-top: 30px; text-align: center; color: #aaa; font-size: 10px; border-top: 1px solid #e5e7eb; }
+
+        /* --- DETAIL PAGES --- */
+        .detail-section { padding: 40px 60px; }
+        .page-break { page-break-before: always; }
+
+        .section-title { font-size: 20px; color: #1a56db; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .device-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        .device-table th { background: #1e293b; color: #fff; text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .device-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .device-table tr:nth-child(even) { background: #f8fafc; }
+        .pass { color: #16a34a; font-weight: 600; } .fail { color: #dc2626; font-weight: 600; }
+
+        .grade-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; color: #fff; font-weight: 700; font-size: 13px; }
+        .grade-a { background: #16a34a; } .grade-b { background: #2563eb; } .grade-c { background: #d97706; } .grade-d { background: #ea580c; } .grade-f { background: #dc2626; }
+
+        .device-block { margin-bottom: 24px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .device-block-header { padding: 12px 16px; background: #1e293b; color: #fff; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; }
+        .device-block table { width: 100%; border-collapse: collapse; }
+        .device-block table th { background: #fef3f2; color: #1a1a2e; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; }
+        .device-block table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+        .device-all-pass { padding: 16px; background: #f0fdf4; color: #16a34a; font-weight: 600; text-align: center; }
+
+        .footer { padding: 30px 60px; text-align: center; color: #999; font-size: 11px; border-top: 2px solid #e5e7eb; }
+
+        @media print {
+            .no-print { display: none; }
+            .cover { min-height: auto; page-break-after: always; }
+            .page-break { page-break-before: always; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .grade-badge, .summary-box, .device-table th, .device-block-header, .msp-badge, .donut-card, .score-hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">Print / Save as PDF</button>
+        <button class="btn-gray" onclick="window.close()">Close</button>
+    </div>
+
+    <!-- BRANDED HEADER -->
+    <div class="brand-bar">
+        <div class="brand-left">
+            <div class="brand-shield">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="brand-text">
+                <div class="brand-name">PC Plus Computing</div>
+                <div class="brand-tagline">Your Security. Our Priority. Always Protected.</div>
+            </div>
+        </div>
+        <div class="brand-right">
+            <div class="date" id="r-date"></div>
+            <div class="report-id" id="r-id"></div>
+        </div>
+    </div>
+
+    <!-- PAGE 1: EXECUTIVE SUMMARY -->
+    <div class="cover" id="page-exec">
+        <div class="cover-header">
+            <div class="cover-brand">
+                <div class="customer-logo" id="r-customer">-</div>
+                <div class="report-type">Endpoint Security Assessment</div>
+            </div>
+        </div>
+
+        <div class="score-hero">
+            <div class="score-hero-left">
+                <canvas id="donut-main" width="140" height="140"></canvas>
+            </div>
+            <div class="score-hero-right">
+                <div class="headline" id="r-headline">-</div>
+                <div class="subline" id="r-subline">-</div>
+            </div>
+        </div>
+
+        <div class="donut-row">
+            <div class="donut-card">
+                <div class="label">Device Status</div>
+                <canvas id="donut-status" width="120" height="120"></canvas>
+                <div class="sub" id="donut-status-sub">-</div>
+            </div>
+            <div class="donut-card">
+                <div class="label">Protection</div>
+                <canvas id="donut-protection" width="120" height="120"></canvas>
+                <div class="sub" id="donut-protection-sub">-</div>
+            </div>
+            <div class="donut-card">
+                <div class="label">Checks Passed</div>
+                <canvas id="donut-checks" width="120" height="120"></canvas>
+                <div class="sub" id="donut-checks-sub">-</div>
+            </div>
+        </div>
+
+        <div class="summary-row" id="r-summary"></div>
+
+        <div style="margin-top:20px">
+            <div class="exec-title">Security by Category</div>
+            <div class="cat-grid" id="r-categories"></div>
+        </div>
+
+        <div style="margin-top:24px">
+            <div class="exec-title">Top Issues Requiring Attention</div>
+            <div class="top-issues-grid" id="r-top-issues"></div>
+        </div>
+
+        <div class="exec-footer">
+            Prepared by PC Plus Computing | Managed IT Services & Endpoint Security | www.pcpluscomputing.com
+        </div>
+    </div>
+
+    <!-- PAGE 2+: DETAILED BREAKDOWN -->
+    <div class="detail-section page-break">
+        <div class="section-title">Device Security Overview</div>
+        <table class="device-table">
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>OS</th>
+                    <th>Grade</th>
+                    <th>Score</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>CPU</th>
+                    <th>RAM</th>
+                    <th>Disk</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="r-devices-body"></tbody>
+        </table>
+
+        <div class="section-title" style="margin-top:30px">Priority Recommendations</div>
+        <table class="device-table">
+            <thead>
+                <tr>
+                    <th style="width:30px">#</th>
+                    <th>Issue</th>
+                    <th>Affected Devices</th>
+                    <th>Priority</th>
+                    <th>Recommendation</th>
+                </tr>
+            </thead>
+            <tbody id="r-recs-body"></tbody>
+        </table>
+    </div>
+
+    <div class="detail-section page-break">
+        <div class="section-title">Per-Device Security Breakdown</div>
+        <div id="r-device-details"></div>
+    </div>
+
+    <div class="footer">
+        <p>Prepared by PC Plus Computing - Endpoint Protection Platform</p>
+        <p>This report reflects the state of all endpoints at the time of generation. For real-time monitoring, visit the dashboard.</p>
+        <p style="margin-top:6px; color: #bbb;">www.pcpluscomputing.com | Managed IT Services & Security</p>
+    </div>
+
+    <script>
+        const API = '/api/dashboard';
+        function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+        function drawDonut(canvasId, segments, centerText, centerSub, size) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2;
+            const r = (size || w) / 2 - 15;
+            const lw = size ? 16 : 20;
+            const total = segments.reduce((s, seg) => s + seg.value, 0);
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (total === 0) {
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = lw; ctx.stroke();
+            } else {
+                let angle = -Math.PI / 2;
+                segments.forEach(seg => {
+                    if (seg.value <= 0) return;
+                    const sweep = (seg.value / total) * Math.PI * 2;
+                    ctx.beginPath(); ctx.arc(cx, cy, r, angle, angle + sweep);
+                    ctx.strokeStyle = seg.color; ctx.lineWidth = lw; ctx.lineCap = 'butt'; ctx.stroke();
+                    angle += sweep;
+                });
+            }
+
+            ctx.fillStyle = '#1a1a2e'; ctx.font = 'bold ' + (size ? '22' : '30') + 'px Segoe UI';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(centerText, cx, centerSub ? cy - 7 : cy);
+            if (centerSub) {
+                ctx.fillStyle = '#888'; ctx.font = (size ? '10' : '12') + 'px Segoe UI';
+                ctx.fillText(centerSub, cx, cy + (size ? 11 : 14));
+            }
+        }
+
+        async function generateReport() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const customer = params.get('customer');
+                if (!customer) { document.body.innerHTML = '<p style="padding:40px">Error: No customer specified</p>'; return; }
+
+                const devices = await fetch(API + '/devices').then(r => r.json());
+                const custDevices = devices.filter(d => (d.customerName || '') === customer);
+
+                if (custDevices.length === 0) { document.body.innerHTML = '<p style="padding:40px">No devices found for "' + customer + '"</p>'; return; }
+
+                // Header
+                const now = new Date();
+                document.getElementById('r-date').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('r-id').textContent = 'Report #CR-' + now.getTime().toString(36).toUpperCase();
+                document.title = 'Security Report - ' + customer;
+                document.getElementById('r-customer').textContent = customer;
+
+                // Parse all checks
+                const deviceData = custDevices.map(d => {
+                    let checks = [];
+                    try {
+                        if (d.securityChecksJson && d.securityChecksJson !== '[]')
+                            checks = JSON.parse(d.securityChecksJson).map(c => ({
+                                id: c.Id || c.id, name: c.Name || c.name, category: c.Category || c.category,
+                                passed: c.Passed != null ? c.Passed : c.passed, detail: c.Detail || c.detail,
+                                recommendation: c.Recommendation || c.recommendation, weight: c.Weight || c.weight
+                            }));
+                    } catch(e) {}
+                    return { ...d, checks };
+                });
+
+                // Stats
+                const online = deviceData.filter(d => d.isOnline).length;
+                const offline = deviceData.length - online;
+                const avgScore = Math.round(deviceData.reduce((s, d) => s + (d.securityScore || 0), 0) / deviceData.length);
+                const totalChecks = deviceData.reduce((s, d) => s + d.checks.length, 0);
+                const totalPassed = deviceData.reduce((s, d) => s + d.checks.filter(c => c.passed).length, 0);
+                const totalFailed = totalChecks - totalPassed;
+                const protected_ = deviceData.filter(d => d.runningModules > 0).length;
+                const grade = avgScore >= 90 ? 'A' : avgScore >= 80 ? 'B' : avgScore >= 70 ? 'C' : avgScore >= 60 ? 'D' : 'F';
+                const gradeWord = avgScore >= 90 ? 'Excellent' : avgScore >= 80 ? 'Good' : avgScore >= 70 ? 'Fair' : avgScore >= 60 ? 'Needs Improvement' : 'Critical Attention Required';
+
+                // Main score donut
+                const scoreColor = avgScore >= 80 ? '#16a34a' : avgScore >= 60 ? '#d97706' : '#dc2626';
+                drawDonut('donut-main',
+                    [{ value: avgScore, color: scoreColor }, { value: 100 - avgScore, color: '#e5e7eb' }],
+                    avgScore + '%', 'Grade ' + grade);
+
+                // Headline
+                document.getElementById('r-headline').textContent = 'Security Score: ' + avgScore + '/100 - ' + gradeWord;
+                const passRate = totalChecks > 0 ? Math.round(totalPassed / totalChecks * 100) : 0;
+                document.getElementById('r-subline').textContent =
+                    'Across ' + deviceData.length + ' managed endpoint' + (deviceData.length > 1 ? 's' : '') + ', ' +
+                    passRate + '% of security checks are passing. ' +
+                    totalFailed + ' issue' + (totalFailed !== 1 ? 's' : '') + ' identified that ' +
+                    (totalFailed === 1 ? 'requires' : 'require') + ' attention to strengthen your security posture.';
+
+                // Small donuts
+                drawDonut('donut-status',
+                    [{ value: online, color: '#22c55e' }, { value: offline, color: '#94a3b8' }],
+                    online + '/' + deviceData.length, 'online', 120);
+                document.getElementById('donut-status-sub').textContent = online + ' online, ' + offline + ' offline';
+
+                drawDonut('donut-protection',
+                    [{ value: protected_, color: '#22c55e' }, { value: deviceData.length - protected_, color: '#ef4444' }],
+                    protected_ + '/' + deviceData.length, 'protected', 120);
+                document.getElementById('donut-protection-sub').textContent = protected_ + ' actively monitored';
+
+                drawDonut('donut-checks',
+                    [{ value: totalPassed, color: '#22c55e' }, { value: totalFailed, color: '#ef4444' }],
+                    passRate + '%', 'pass rate', 120);
+                document.getElementById('donut-checks-sub').textContent = totalPassed + ' passed, ' + totalFailed + ' failed';
+
+                // Summary boxes
+                document.getElementById('r-summary').innerHTML = `
+                    <div class="summary-box"><div class="num blue">${deviceData.length}</div><div class="lbl">Endpoints</div></div>
+                    <div class="summary-box"><div class="num green">${totalPassed}</div><div class="lbl">Checks Passed</div></div>
+                    <div class="summary-box"><div class="num red">${totalFailed}</div><div class="lbl">Issues Found</div></div>
+                    <div class="summary-box"><div class="num ${avgScore >= 80 ? 'green' : avgScore >= 60 ? 'orange' : 'red'}">${grade}</div><div class="lbl">Security Grade</div></div>
+                `;
+
+                // Top issues
+                const issueMap = {};
+                deviceData.forEach(d => {
+                    d.checks.filter(c => !c.passed).forEach(c => {
+                        if (!issueMap[c.id]) issueMap[c.id] = { name: c.name, category: c.category, recommendation: c.recommendation, weight: c.weight, devices: [] };
+                        issueMap[c.id].devices.push(d.hostname || d.deviceId);
+                    });
+                });
+                const topIssues = Object.values(issueMap).sort((a, b) => b.devices.length - a.devices.length || b.weight - a.weight);
+
+                // Category breakdown
+                const catIcons = { 'Protection': '\u{1F6E1}', 'Identity & Access': '\u{1F511}', 'Network': '\u{1F310}',
+                    'Ransomware Protection': '\u{1F6A8}', 'Updates': '\u{1F504}', 'Data Protection': '\u{1F4BE}',
+                    'Device Health': '\u{1F4BB}', 'EDR & Advanced': '\u{1F52C}', 'Access': '\u{1F511}',
+                    'Logging & Visibility': '\u{1F4CB}', 'Endpoint Hardening': '\u{1F512}',
+                    'Device Control': '\u{1F50C}', 'Browser & User Risk': '\u{1F310}',
+                    'Hardware Security': '\u{1F527}', 'Privilege Escalation': '\u26A0' };
+                const catMap = {};
+                deviceData.forEach(d => {
+                    d.checks.forEach(c => {
+                        const cat = c.category || 'Other';
+                        if (!catMap[cat]) catMap[cat] = { total: 0, passed: 0 };
+                        catMap[cat].total++;
+                        if (c.passed) catMap[cat].passed++;
+                    });
+                });
+                const catEntries = Object.entries(catMap).sort((a, b) => (a[1].passed / a[1].total) - (b[1].passed / b[1].total));
+                document.getElementById('r-categories').innerHTML = catEntries.map(([cat, data]) => {
+                    const pct = Math.round(data.passed / data.total * 100);
+                    const color = pct >= 80 ? '#16a34a' : pct >= 60 ? '#d97706' : '#dc2626';
+                    const icon = catIcons[cat] || '\u{2699}';
+                    return `<div class="cat-row">
+                        <span class="cat-icon">${icon}</span>
+                        <span class="cat-name">${esc(cat)}</span>
+                        <div class="cat-bar-wrap"><div class="cat-bar" style="width:${pct}%;background:${color}"></div></div>
+                        <span class="cat-pct" style="color:${color}">${pct}%</span>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('r-top-issues').innerHTML = topIssues.slice(0, 6).map(issue => `
+                    <div class="issue-card">
+                        <div class="issue-name">${esc(issue.name)}</div>
+                        <div class="issue-meta">${issue.devices.length} of ${deviceData.length} devices | ${issue.weight} pts</div>
+                        <div class="issue-rec">${esc(issue.recommendation)}</div>
+                    </div>
+                `).join('') || '<p style="color:#16a34a;font-weight:600;padding:16px">No critical issues found - great job!</p>';
+
+                // --- DETAIL PAGE: Device table ---
+                document.getElementById('r-devices-body').innerHTML = deviceData
+                    .sort((a, b) => (a.securityScore || 0) - (b.securityScore || 0))
+                    .map(d => {
+                        const g = (d.securityGrade || 'F').toLowerCase();
+                        const passed = d.checks.filter(c => c.passed).length;
+                        const failed = d.checks.filter(c => !c.passed).length;
+                        return `<tr>
+                            <td style="font-weight:600">${esc(d.hostname)}</td>
+                            <td style="font-size:11px;color:#666">${esc(d.osVersion || '-')}</td>
+                            <td><span class="grade-badge grade-${g}">${(d.securityGrade || 'F').toUpperCase()}</span></td>
+                            <td style="font-weight:600">${d.securityScore || 0}/100</td>
+                            <td class="pass">${passed}</td>
+                            <td class="fail">${failed}</td>
+                            <td>${Math.round(d.cpuPercent || 0)}%</td>
+                            <td>${Math.round(d.ramPercent || 0)}%</td>
+                            <td>${Math.round(d.diskPercent || 0)}%</td>
+                            <td style="color:${d.isOnline ? '#16a34a' : '#dc2626'};font-weight:600">${d.isOnline ? 'Online' : 'Offline'}</td>
+                        </tr>`;
+                    }).join('');
+
+                // Recommendations
+                document.getElementById('r-recs-body').innerHTML = topIssues.slice(0, 15).map((issue, i) => `
+                    <tr>
+                        <td style="font-weight:600">${i + 1}</td>
+                        <td class="fail" style="font-weight:600">${esc(issue.name)}</td>
+                        <td style="font-size:11px">${issue.devices.map(d => esc(d)).join(', ')}</td>
+                        <td>${issue.weight >= 10 ? '<span style="color:#dc2626;font-weight:600">HIGH</span>' : issue.weight >= 5 ? '<span style="color:#d97706;font-weight:600">MEDIUM</span>' : '<span style="color:#666">LOW</span>'}</td>
+                        <td style="font-size:12px">${esc(issue.recommendation)}</td>
+                    </tr>
+                `).join('');
+
+                // Per-device breakdown
+                const detailsEl = document.getElementById('r-device-details');
+                detailsEl.innerHTML = deviceData
+                    .sort((a, b) => (a.securityScore || 0) - (b.securityScore || 0))
+                    .map(d => {
+                        const failed = d.checks.filter(c => !c.passed);
+                        if (failed.length === 0) return `
+                            <div class="device-block">
+                                <div class="device-block-header">
+                                    <span>${esc(d.hostname)}</span>
+                                    <span>${d.securityScore}/100 (${d.securityGrade})</span>
+                                </div>
+                                <div class="device-all-pass">All ${d.checks.length} security checks passed</div>
+                            </div>`;
+                        return `
+                            <div class="device-block">
+                                <div class="device-block-header">
+                                    <span>${esc(d.hostname)} - ${esc(d.osVersion || '')}</span>
+                                    <span>Score: ${d.securityScore}/100 (${d.securityGrade}) | ${failed.length} issue${failed.length > 1 ? 's' : ''}</span>
+                                </div>
+                                <table>
+                                    <tr><th>Check</th><th>Category</th><th>Details</th><th style="width:50px">Weight</th></tr>
+                                    ${failed.map(c => `<tr>
+                                        <td class="fail" style="font-weight:600">${esc(c.name)}</td>
+                                        <td>${esc(c.category)}</td>
+                                        <td>${esc(c.detail)}</td>
+                                        <td style="text-align:center;font-weight:600">${c.weight}</td>
+                                    </tr>`).join('')}
+                                </table>
+                            </div>`;
+                    }).join('');
+
+            } catch(err) {
+                console.error('Company report error:', err);
+                document.body.innerHTML = '<p style="color:red;padding:40px">Error generating report: ' + err.message + '</p>';
+            }
+        }
+
+        generateReport();
+    </script>
+</body>
+</html>

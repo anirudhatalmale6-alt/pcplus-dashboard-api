@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Plus Computing - Endpoint Security Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a2e; background: #fff; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1a56db; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { font-size: 24px; color: #1a56db; }
+        .header .company { font-size: 14px; color: #666; }
+        .header .date { font-size: 12px; color: #888; }
+        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .meta-card { background: #f8f9fa; border-radius: 8px; padding: 16px; border-left: 4px solid #1a56db; }
+        .meta-card label { font-size: 11px; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+        .meta-card .value { font-size: 16px; font-weight: 600; margin-top: 4px; }
+        .score-section { text-align: center; margin: 30px 0; padding: 30px; background: linear-gradient(135deg, #f0f4ff, #e8ecff); border-radius: 12px; }
+        .score-circle { display: inline-flex; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; font-size: 36px; font-weight: 700; color: #fff; }
+        .score-label { margin-top: 12px; font-size: 18px; font-weight: 600; }
+        .score-grade { font-size: 14px; color: #666; margin-top: 4px; }
+        .section { margin: 30px 0; }
+        .section h2 { font-size: 18px; color: #1a56db; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+        .check-table { width: 100%; border-collapse: collapse; }
+        .check-table th { background: #f1f5f9; text-align: left; padding: 10px 12px; font-size: 12px; text-transform: uppercase; color: #666; }
+        .check-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        .check-table tr:nth-child(even) { background: #fafbfc; }
+        .pass { color: #16a34a; font-weight: 600; }
+        .fail { color: #dc2626; font-weight: 600; }
+        .recommendation { color: #d97706; font-style: italic; font-size: 12px; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 30px; }
+        .summary-card { text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px; }
+        .summary-card .number { font-size: 28px; font-weight: 700; }
+        .summary-card .label { font-size: 11px; color: #666; text-transform: uppercase; margin-top: 4px; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #999; font-size: 11px; }
+        .no-print { margin-bottom: 20px; text-align: center; }
+        .no-print button { background: #1a56db; color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .no-print button:hover { background: #1e40af; }
+        @media print {
+            body { padding: 20px; }
+            .no-print { display: none; }
+            .score-section { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .pass, .fail { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">Print / Save as PDF</button>
+        <button onclick="window.close()" style="background:#6b7280;margin-left:10px">Close</button>
+    </div>
+
+    <div id="report-content">
+        <div class="header">
+            <div>
+                <h1>Endpoint Security Report</h1>
+                <div class="company">PC Plus Computing - Endpoint Protection</div>
+            </div>
+            <div style="text-align:right">
+                <div class="date" id="report-date"></div>
+                <div class="date" id="report-id"></div>
+            </div>
+        </div>
+
+        <div class="meta">
+            <div class="meta-card">
+                <label>Device Name</label>
+                <div class="value" id="r-hostname">-</div>
+            </div>
+            <div class="meta-card">
+                <label>Customer</label>
+                <div class="value" id="r-customer">-</div>
+            </div>
+            <div class="meta-card">
+                <label>Operating System</label>
+                <div class="value" id="r-os">-</div>
+            </div>
+            <div class="meta-card">
+                <label>Agent Version</label>
+                <div class="value" id="r-agent">-</div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-circle" id="r-score-circle">-</div>
+            <div class="score-label">Security Score</div>
+            <div class="score-grade" id="r-grade-text">-</div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="number pass" id="r-passed">-</div>
+                <div class="label">Checks Passed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number fail" id="r-failed">-</div>
+                <div class="label">Issues Found</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" id="r-total">-</div>
+                <div class="label">Total Checks</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" id="r-uptime" style="font-size:20px">-</div>
+                <div class="label">System Uptime</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Security Audit Results</h2>
+            <table class="check-table">
+                <thead>
+                    <tr>
+                        <th style="width:30px">Status</th>
+                        <th>Check</th>
+                        <th>Category</th>
+                        <th>Details</th>
+                        <th style="width:50px">Points</th>
+                    </tr>
+                </thead>
+                <tbody id="r-checks-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section" id="r-recommendations-section" style="display:none">
+            <h2>Recommendations</h2>
+            <table class="check-table">
+                <thead>
+                    <tr>
+                        <th style="width:30px">#</th>
+                        <th>Issue</th>
+                        <th>Recommendation</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody id="r-recs-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>System Health Snapshot</h2>
+            <div class="summary-grid" id="r-health-grid">
+            </div>
+        </div>
+
+        <div class="section" id="r-software-section" style="display:none">
+            <h2>Installed Software</h2>
+            <p style="font-size:12px;color:#666;margin-bottom:12px">Software inventory from endpoint agent. Outdated or unpatched applications may pose security risks.</p>
+            <table class="check-table">
+                <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Version</th>
+                        <th>Publisher</th>
+                    </tr>
+                </thead>
+                <tbody id="r-software-body"></tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generated by PC Plus Computing - Endpoint Protection Platform</p>
+            <p>This report reflects the device state at the time of generation. For real-time monitoring, visit the dashboard.</p>
+            <p style="margin-top:8px">www.pcpluscomputing.com | Managed IT Services & Security</p>
+        </div>
+    </div>
+
+    <script>
+        const API = '/api/dashboard';
+
+        function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+        async function generateReport() {
+            try {
+            const params = new URLSearchParams(window.location.search);
+            const deviceId = params.get('deviceId');
+            if (!deviceId) { document.body.innerHTML = '<p>Error: No deviceId specified</p>'; return; }
+
+            // Fetch device data
+            const resp = await fetch(API + '/devices/' + encodeURIComponent(deviceId));
+            if (!resp.ok) { document.body.innerHTML = '<p>Error: Failed to load device (HTTP ' + resp.status + '). DeviceId: ' + deviceId + '</p>'; return; }
+            const device = await resp.json();
+
+            // Report metadata
+            const now = new Date();
+            document.getElementById('report-date').textContent = 'Generated: ' + now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('report-id').textContent = 'Report ID: RPT-' + deviceId.substring(0, 8).toUpperCase() + '-' + now.getTime().toString(36).toUpperCase();
+            document.title = 'Security Report - ' + (device.hostname || 'Device');
+
+            // Device info
+            document.getElementById('r-hostname').textContent = device.hostname || '-';
+            document.getElementById('r-customer').textContent = device.customerName || '-';
+            document.getElementById('r-os').textContent = device.osVersion || '-';
+            document.getElementById('r-agent').textContent = 'v' + (device.agentVersion || '-');
+
+            // Score
+            const score = device.securityScore || 0;
+            const scoreEl = document.getElementById('r-score-circle');
+            scoreEl.textContent = score;
+            scoreEl.style.background = score >= 90 ? '#16a34a' : score >= 80 ? '#2563eb' : score >= 70 ? '#d97706' : '#dc2626';
+            document.getElementById('r-grade-text').textContent = 'Grade: ' + (device.securityGrade || '-') + ' (' + (score >= 90 ? 'Excellent' : score >= 80 ? 'Good' : score >= 70 ? 'Fair' : score >= 60 ? 'Needs Attention' : 'Critical') + ')';
+
+            // Parse security checks
+            let checks = [];
+            try {
+                if (device.securityChecksJson && device.securityChecksJson !== '[]') {
+                    checks = JSON.parse(device.securityChecksJson).map(c => ({
+                        id: c.Id || c.id, name: c.Name || c.name, category: c.Category || c.category,
+                        passed: c.Passed != null ? c.Passed : c.passed, detail: c.Detail || c.detail,
+                        recommendation: c.Recommendation || c.recommendation, weight: c.Weight || c.weight
+                    }));
+                }
+            } catch(e) {}
+
+            const passed = checks.filter(c => c.passed).length;
+            const failed = checks.filter(c => !c.passed).length;
+            document.getElementById('r-passed').textContent = passed;
+            document.getElementById('r-failed').textContent = failed;
+            document.getElementById('r-total').textContent = checks.length;
+
+            // Uptime
+            const lastSeen = device.lastSeen ? new Date(device.lastSeen) : null;
+            document.getElementById('r-uptime').textContent = device.isOnline ? 'Online' : (lastSeen ? 'Last seen ' + timeSince(lastSeen) : 'Offline');
+
+            // Checks table
+            const tbody = document.getElementById('r-checks-body');
+            // Sort: failed first, then by category
+            const sorted = [...checks].sort((a, b) => (a.passed === b.passed) ? a.category.localeCompare(b.category) : (a.passed ? 1 : -1));
+            tbody.innerHTML = sorted.map(c => `
+                <tr>
+                    <td class="${c.passed ? 'pass' : 'fail'}">${c.passed ? '\u2713' : '\u2717'}</td>
+                    <td style="font-weight:600">${esc(c.name)}</td>
+                    <td>${esc(c.category)}</td>
+                    <td>${esc(c.detail)}${!c.passed && c.recommendation ? '<br><span class="recommendation">\u26A0 ' + esc(c.recommendation) + '</span>' : ''}</td>
+                    <td style="text-align:center">${c.weight}</td>
+                </tr>
+            `).join('');
+
+            // Recommendations section
+            const failedChecks = checks.filter(c => !c.passed && c.recommendation);
+            if (failedChecks.length > 0) {
+                document.getElementById('r-recommendations-section').style.display = 'block';
+                const recsBody = document.getElementById('r-recs-body');
+                recsBody.innerHTML = failedChecks.map((c, i) => `
+                    <tr>
+                        <td style="font-weight:600">${i + 1}</td>
+                        <td class="fail">${esc(c.name)}</td>
+                        <td>${esc(c.recommendation)}</td>
+                        <td>${c.weight >= 10 ? '<span style="color:#dc2626;font-weight:600">High</span>' : c.weight >= 5 ? '<span style="color:#d97706;font-weight:600">Medium</span>' : '<span style="color:#666">Low</span>'}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Health snapshot
+            const healthGrid = document.getElementById('r-health-grid');
+            healthGrid.innerHTML = `
+                <div class="summary-card">
+                    <div class="number" style="color:${device.cpuPercent > 80 ? '#dc2626' : '#16a34a'}">${(device.cpuPercent || 0).toFixed(0)}%</div>
+                    <div class="label">CPU Usage</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number" style="color:${device.ramPercent > 85 ? '#dc2626' : '#16a34a'}">${(device.ramPercent || 0).toFixed(0)}%</div>
+                    <div class="label">RAM Usage</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number" style="color:${device.diskPercent > 85 ? '#dc2626' : '#16a34a'}">${(device.diskPercent || 0).toFixed(0)}%</div>
+                    <div class="label">Disk Usage</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number" style="color:${device.cpuTempC > 80 ? '#dc2626' : '#16a34a'}">${device.cpuTempC > 0 ? (device.cpuTempC).toFixed(0) + '\u00B0C' : 'N/A'}</div>
+                    <div class="label">CPU Temperature</div>
+                </div>
+            `;
+
+            // Software inventory section
+            let softwareList = [];
+            try {
+                if (device.installedSoftwareJson && device.installedSoftwareJson !== '[]')
+                    softwareList = JSON.parse(device.installedSoftwareJson).map(s => ({
+                        name: s.Name || s.name, version: s.Version || s.version,
+                        publisher: s.Publisher || s.publisher, installDate: s.InstallDate || s.installDate
+                    }));
+            } catch(e) {}
+
+            if (softwareList.length > 0) {
+                document.getElementById('r-software-section').style.display = 'block';
+                const swBody = document.getElementById('r-software-body');
+                swBody.innerHTML = softwareList.sort((a,b) => (a.name||'').localeCompare(b.name||'')).map(s => `
+                    <tr>
+                        <td>${esc(s.name)}</td>
+                        <td style="font-family:monospace;font-size:12px">${esc(s.version)}</td>
+                        <td style="font-size:12px;color:#666">${esc(s.publisher)}</td>
+                    </tr>
+                `).join('');
+            }
+            } catch(err) {
+                console.error('Report generation error:', err);
+                document.body.innerHTML = '<p style="color:red;padding:40px">Error generating report: ' + err.message + '</p>';
+            }
+        }
+
+        function timeSince(date) {
+            const s = Math.floor((new Date() - date) / 1000);
+            if (s < 60) return s + 's ago';
+            if (s < 3600) return Math.floor(s / 60) + 'm ago';
+            if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+            return Math.floor(s / 86400) + 'd ago';
+        }
+
+        generateReport();
+    </script>
+</body>
+</html>

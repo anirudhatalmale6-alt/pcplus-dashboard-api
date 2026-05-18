@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Plus Computing - Endpoint Protection Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+<div class="app">
+    <!-- Mobile menu button -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h1>PC Plus Computing</h1>
+            <span>Endpoint Protection</span>
+        </div>
+
+        <div class="nav-section">Main</div>
+        <div class="nav-item active" onclick="showPage('overview')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Overview</span>
+        </div>
+        <div class="nav-item" onclick="showPage('devices')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Devices</span>
+        </div>
+        <div class="nav-item" onclick="showPage('alerts')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Alerts</span>
+        </div>
+
+        <div class="nav-section">Security</div>
+        <div class="nav-item" onclick="showPage('incidents')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Incidents</span>
+        </div>
+        <div class="nav-item" onclick="showPage('policies')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Policies</span>
+        </div>
+
+        <div class="nav-section">Analytics</div>
+        <div class="nav-item" onclick="showPage('trends')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Trends</span>
+        </div>
+
+        <div class="nav-section">Settings</div>
+        <div class="nav-item" onclick="showPage('config')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Config Push</span>
+        </div>
+        <div class="nav-item" onclick="showPage('email-reports')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Email Reports</span>
+        </div>
+        <div class="nav-item" onclick="showPage('notifications')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/><line x1="12" y1="2" x2="12" y2="2"/></svg>
+            <span>Notifications</span>
+        </div>
+        <div class="nav-item" onclick="showPage('users')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Users</span>
+        </div>
+        <div class="nav-item" onclick="showPage('branding')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Branding</span>
+        </div>
+
+        <div style="margin-top:auto;padding:16px">
+            <div class="nav-item" onclick="logout()" style="color:#ef4444">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Logout</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Overview Page - Security Dashboard -->
+        <div id="page-overview" class="page">
+            <div class="page-header">
+                <h2>Security Dashboard</h2>
+                <div class="header-actions">
+                    <span class="refresh-dot"></span>
+                    <span style="font-size:12px;color:var(--text-muted);margin-left:4px">Live</span>
+                </div>
+            </div>
+
+            <!-- Top Row: Summary Cards -->
+            <div class="stat-grid" id="overview-stats"></div>
+
+            <!-- Middle Row: Alerts Chart + Donut -->
+            <div class="grid-2">
+                <div class="card" style="padding:20px">
+                    <div class="card-header" style="margin-bottom:12px"><h3>Alerts by Category</h3></div>
+                    <div id="alerts-donut" style="display:flex;align-items:center;justify-content:center;min-height:200px"></div>
+                </div>
+                <div class="card" style="padding:20px">
+                    <div class="card-header" style="margin-bottom:12px"><h3>Security Alerts Over Time</h3></div>
+                    <canvas id="alerts-timeline" height="200" style="width:100%"></canvas>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Threats Table + Protection Status -->
+            <div class="grid-3-2">
+                <div class="card" style="padding:20px">
+                    <div class="card-header" style="margin-bottom:12px">
+                        <h3>Customers</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="showPage('devices')">All Devices</button>
+                    </div>
+                    <table style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Endpoints</th>
+                                <th>Avg Score</th>
+                                <th>Alerts</th>
+                                <th>Online</th>
+                            </tr>
+                        </thead>
+                        <tbody id="security-threats-table"></tbody>
+                    </table>
+                </div>
+                <div class="grid-2x2">
+                    <div class="card" style="padding:20px;text-align:center">
+                        <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Ransomware Protection</h4>
+                        <div id="donut-ransomware"></div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center">
+                        <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Windows Defender</h4>
+                        <div id="donut-defender"></div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center">
+                        <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Security Score</h4>
+                        <div id="donut-security"></div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center">
+                        <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Device Status</h4>
+                        <div id="donut-status"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent Alerts</h3>
+                    <button class="btn btn-sm btn-secondary" onclick="showPage('alerts')">View All</button>
+                </div>
+                <div id="overview-alerts"></div>
+            </div>
+        </div>
+
+        <!-- Customer Dashboard Page -->
+        <div id="page-customer" class="page" style="display:none">
+            <div class="page-header">
+                <h2 id="customer-title">Customer Dashboard</h2>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-primary" onclick="generateCompanyReport('html')" style="background:#1a56db;color:#fff" title="Email-friendly HTML report">Report (HTML)</button>
+                    <button class="btn btn-sm btn-primary" onclick="generateCompanyReport('pdf')" style="background:#7c3aed;color:#fff" title="Print-ready PDF report">Report (PDF)</button>
+                    <button class="btn btn-sm btn-primary" onclick="showCompanyCommands()" style="background:#0891b2;color:#fff" title="Send commands to all devices">Company Commands</button>
+                    <button class="btn btn-sm btn-primary" onclick="showRemediationLibrary()" style="background:#16a34a;color:#fff" title="Fix security issues across all devices">Remediation Library</button>
+                    <button class="btn btn-sm btn-secondary" onclick="showPage('overview')">Back to Overview</button>
+                </div>
+            </div>
+
+            <!-- Customer Stats -->
+            <div class="stat-grid" id="customer-stats"></div>
+
+            <!-- Customer Donuts + Alerts Chart -->
+            <div class="grid-4">
+                <div class="card" style="padding:20px;text-align:center">
+                    <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Device Status</h4>
+                    <div id="cust-donut-status"></div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center">
+                    <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Security Score</h4>
+                    <div id="cust-donut-security"></div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center">
+                    <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Protection</h4>
+                    <div id="cust-donut-protection"></div>
+                </div>
+                <div class="card" style="padding:20px;text-align:center">
+                    <h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Alerts</h4>
+                    <div id="cust-donut-alerts"></div>
+                </div>
+            </div>
+
+            <!-- Customer Devices Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Endpoints</h3>
+                </div>
+                <div class="table-scroll">
+                <table style="width:100%;min-width:800px">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Hostname</th>
+                            <th>Security</th>
+                            <th>CPU</th>
+                            <th>RAM</th>
+                            <th>Disk</th>
+                            <th>CPU Temp</th>
+                            <th>GPU Temp</th>
+                            <th>Modules</th>
+                            <th>Last Seen</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-devices-table"></tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Customer Alerts -->
+            <div class="card" style="margin-top:16px">
+                <div class="card-header">
+                    <h3>Recent Alerts</h3>
+                </div>
+                <div id="customer-alerts"></div>
+            </div>
+        </div>
+
+        <!-- Device Detail Page (Full Kundli View) -->
+        <div id="page-device" class="page" style="display:none">
+            <div class="page-header">
+                <div>
+                    <div id="device-breadcrumb" style="font-size:12px;margin-bottom:4px"></div>
+                    <h2 id="device-title">Device Detail</h2>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-primary" onclick="generateDeviceReport()" style="margin-right:8px">Generate Report</button>
+                    <button class="btn btn-sm btn-secondary" onclick="if(currentCustomer){showCustomerDashboard(currentCustomer)}else{showPage('overview')}">Back</button>
+                </div>
+            </div>
+            <div id="device-detail-content"></div>
+        </div>
+
+        <!-- Devices Page -->
+        <div id="page-devices" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Devices</h2>
+                <div class="header-actions">
+                    <input type="text" id="device-search" placeholder="Search devices..." style="padding:6px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:13px" oninput="filterDevices()">
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-scroll">
+                <table style="min-width:900px">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Hostname</th>
+                            <th>Customer</th>
+                            <th>Security</th>
+                            <th>CPU</th>
+                            <th>RAM</th>
+                            <th>Disk</th>
+                            <th>CPU Temp</th>
+                            <th>GPU Temp</th>
+                            <th>Tier</th>
+                            <th>Modules</th>
+                            <th>Last Seen</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devices-table"></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Page -->
+        <div id="page-alerts" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Alert Feed</h2>
+                <div class="header-actions">
+                    <select id="alert-filter" onchange="loadAlerts()" style="padding:6px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:13px">
+                        <option value="">All Severities</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Critical">Critical</option>
+                        <option value="Warning">Warning</option>
+                        <option value="Info">Info</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card" id="alerts-feed"></div>
+        </div>
+
+        <!-- Incidents Page -->
+        <div id="page-incidents" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Incidents</h2>
+            </div>
+            <div class="card">
+                <div class="table-scroll">
+                <table style="min-width:700px">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Device</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>When</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incidents-table"></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Policies Page -->
+        <div id="page-policies" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Policy Profiles</h2>
+                <button class="btn btn-primary btn-sm" onclick="showNewPolicyModal()">+ New Profile</button>
+            </div>
+            <div id="policies-grid" class="stat-grid"></div>
+        </div>
+
+        <!-- Config Push Page -->
+        <div id="page-config" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Push Configuration</h2>
+            </div>
+            <div class="card" style="padding:24px">
+                <h3 style="margin-bottom:16px">Push Scoring Weights to Endpoints</h3>
+                <div class="grid-2x2" style="gap:12px">
+                    <div class="form-group">
+                        <label>Target Device (empty = all)</label>
+                        <select id="config-device">
+                            <option value="">All Devices</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Or Target Policy Profile</label>
+                        <select id="config-profile">
+                            <option value="">No profile (device-specific)</option>
+                        </select>
+                    </div>
+                </div>
+                <h4 style="margin:16px 0 12px;font-size:14px;color:var(--text-secondary)">Behavior Scoring Weights</h4>
+                <div class="grid-3" id="scoring-weights">
+                    <div class="form-group"><label>Honeypot Triggered</label><input type="number" data-key="scoreHoneypotTriggered" value="50"></div>
+                    <div class="form-group"><label>Known Ransomware</label><input type="number" data-key="scoreKnownRansomware" value="50"></div>
+                    <div class="form-group"><label>Shadow Copy Deletion</label><input type="number" data-key="scoreShadowCopyDeletion" value="40"></div>
+                    <div class="form-group"><label>Ransom Note Creation</label><input type="number" data-key="scoreRansomNoteCreation" value="35"></div>
+                    <div class="form-group"><label>Multi-Folder Touch</label><input type="number" data-key="scoreMultiFolderTouch" value="25"></div>
+                    <div class="form-group"><label>Mass Extension Change</label><input type="number" data-key="scoreMassExtensionChange" value="20"></div>
+                    <div class="form-group"><label>Suspicious PowerShell</label><input type="number" data-key="scoreSuspiciousPowerShell" value="20"></div>
+                    <div class="form-group"><label>High File Rename Rate</label><input type="number" data-key="scoreHighFileRenameRate" value="20"></div>
+                    <div class="form-group"><label>High Entropy Write</label><input type="number" data-key="scoreHighEntropyWrite" value="15"></div>
+                    <div class="form-group"><label>Suspicious Parent-Child</label><input type="number" data-key="scoreSuspiciousParentChild" value="15"></div>
+                    <div class="form-group"><label>Risky Launch Path</label><input type="number" data-key="scoreRiskyLaunchPath" value="10"></div>
+                    <div class="form-group"><label>Ransomware Extension</label><input type="number" data-key="scoreRansomwareExtension" value="10"></div>
+                    <div class="form-group"><label>File Rename</label><input type="number" data-key="scoreFileRename" value="5"></div>
+                    <div class="form-group"><label>Unsigned Process</label><input type="number" data-key="scoreUnsignedProcess" value="5"></div>
+                </div>
+                <h4 style="margin:16px 0 12px;font-size:14px;color:var(--text-secondary)">Thresholds</h4>
+                <div class="grid-4col">
+                    <div class="form-group"><label>Warning Threshold</label><input type="number" id="cfg-warning" value="30"></div>
+                    <div class="form-group"><label>Containment Threshold</label><input type="number" id="cfg-containment" value="60"></div>
+                    <div class="form-group"><label>Lockdown Threshold</label><input type="number" id="cfg-lockdown" value="80"></div>
+                    <div class="form-group"><label>Decay Per Minute</label><input type="number" id="cfg-decay" value="5"></div>
+                </div>
+                <div style="margin-top:16px;display:flex;gap:8px">
+                    <button class="btn btn-primary" onclick="pushConfig()">Push to Endpoints</button>
+                    <button class="btn btn-secondary" onclick="resetConfigDefaults()">Reset Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Reports Page -->
+        <div id="page-email-reports" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Email Reports</h2>
+            </div>
+            <div id="email-reports-content">
+                <div style="text-align:center;padding:40px;color:var(--text-muted)">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Trends Page -->
+        <div id="page-trends" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Historical Trends</h2>
+                <div class="header-actions">
+                    <select id="trend-range" onchange="loadTrends()" style="padding:6px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:13px">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                    <select id="trend-customer" onchange="loadTrends()" style="padding:6px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:13px">
+                        <option value="">All Customers</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-2x2" style="margin-bottom:16px">
+                <div class="card" style="padding:20px"><h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Security Score Over Time</h4><canvas id="trend-security" height="200" style="width:100%"></canvas></div>
+                <div class="card" style="padding:20px"><h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">CPU Usage Over Time</h4><canvas id="trend-cpu" height="200" style="width:100%"></canvas></div>
+                <div class="card" style="padding:20px"><h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">RAM Usage Over Time</h4><canvas id="trend-ram" height="200" style="width:100%"></canvas></div>
+                <div class="card" style="padding:20px"><h4 style="margin-bottom:12px;font-size:13px;color:var(--text-muted)">Disk Usage Over Time</h4><canvas id="trend-disk" height="200" style="width:100%"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Notifications Page -->
+        <div id="page-notifications" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Alert Notifications</h2>
+                <button class="btn btn-primary btn-sm" onclick="showAddNotification()">+ Add Webhook</button>
+            </div>
+            <div id="notifications-content">
+                <div style="text-align:center;padding:40px;color:var(--text-muted)">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Users Page -->
+        <div id="page-users" class="page" style="display:none">
+            <div class="page-header">
+                <h2>User Management</h2>
+                <button class="btn btn-primary btn-sm" onclick="showAddUser()">+ Add User</button>
+            </div>
+            <div id="users-content">
+                <div style="text-align:center;padding:40px;color:var(--text-muted)">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Branding Page -->
+        <div id="page-branding" class="page" style="display:none">
+            <div class="page-header">
+                <h2>Dashboard Branding</h2>
+            </div>
+            <div id="branding-content">
+                <div style="text-align:center;padding:40px;color:var(--text-muted)">Loading...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Config Push Modal -->
+<div class="modal-overlay" id="device-modal">
+    <div class="modal" id="device-modal-content"></div>
+</div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

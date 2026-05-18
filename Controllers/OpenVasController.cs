@@ -137,14 +137,12 @@ namespace PCPlus.Dashboard.Controllers
 
             try
             {
-                var container = _config["OpenVAS:Container"] ?? "openvas";
-                var user = _config["OpenVAS:User"] ?? "admin";
-                var pass = _config["OpenVAS:Password"] ?? "PCplus2026!";
+                var scriptPath = _config["OpenVAS:ScriptPath"] ?? "/opt/pcplus-dashboard/gvm-query.sh";
 
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "docker",
-                    Arguments = $"exec -u gvm {container} gvm-cli --gmp-username {user} --gmp-password \"{pass}\" tls --hostname 127.0.0.1 --port 9390 --xml \"{xmlCommand.Replace("\"", "\\\"")}\"",
+                    FileName = "sudo",
+                    Arguments = $"{scriptPath} \"{xmlCommand.Replace("\"", "\\\"")}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
